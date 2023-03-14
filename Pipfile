@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+spotipy = "*"
+openai = "*"
+requests = "*"
+python-dotenv = "*"
+gunicorn = "*"
+Unidecode = "*"
+Flask = "*"
+flasgger = "*"
+
+[dev-packages]
+
+[scripts]
+start = "gunicorn app:app --bind=0.0.0.0 --reload"
+start-daemon = "gunicorn app:app --bind=0.0.0.0 --daemon"
+
+[requires]
+python_version = "3.9"
