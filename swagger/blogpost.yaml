@@ -1,0 +1,28 @@
+This endpoint returns a ChatGPT-generated blog post about the contents of a given Spotify playlist.
+---
+parameters:
+  - name: playlist_id
+    in: query
+    type: string
+    required: true
+    default: '7lqsZmcl8sIhzC4rCl5zlA'
+    description: ID of the playlist (can be found in the Playlist URL just before the query string)
+definitions:
+  blogpost:
+    type: object
+    properties:
+      playlist_id:
+        type: string
+        default: '7lqsZmcl8sIhzC4rCl5zlA'
+responses:
+  200:
+    description: OK
+    schema:
+      $ref: '#/definitions/blogpost'
+      properties:
+        playlist_id:
+            type: string
+            description: ID of the playlist (can be found in the Playlist URL just before the query string)
+            default: '7lqsZmcl8sIhzC4rCl5zlA'
+    example:
+      playlist_id: '7lqsZmcl8sIhzC4rCl5zlA'
