@@ -12,9 +12,6 @@ class Config:
         self.app_key                  = os.environ.get('APP_KEY')
         self.listen                   = os.environ.get('LISTEN')
         self.port                     = os.environ.get('PORT')
-        self.spotify_client_id        = os.environ.get('SPOTIPY_CLIENT_ID')
-        self.spotify_client_secret    = os.environ.get('SPOTIPY_CLIENT_SECRET')
-        self.openai_api_key           = os.environ.get('OPENAI_API_KEY')
 
         # Tell our app where to get its environment variables from
         dotenv_path = os.path.join(os.path.dirname(__file__), '.env')

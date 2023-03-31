@@ -42,4 +42,4 @@ def blogpost():
     return jsonify(blogpost.generate_blog_post())
 
 if __name__ == '__main__':
-    app.run(host=listen, port=4000)
+    app.run(host=listen, port=port)
