@@ -1,10 +1,10 @@
 ## THIS IS JUST A TEST FILE TO SEE IF I CAN GET THE GPT-3 API TO WORK WITH SPOTIFY PLAYLISTS
 
 import os
+import openai
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv, find_dotenv
-import openai
 
 class Config:
 
@@ -13,8 +13,8 @@ class Config:
         self.app_key                  = os.environ.get('APP_KEY')
         self.listen                   = os.environ.get('LISTEN')
         self.port                     = os.environ.get('PORT')
-        self.spotify_client_id        = os.environ.get('SPOTIFY_CLIENT_ID')
-        self.spotify_client_secret    = os.environ.get('SPOTIFY_CLIENT_SECRET')
+        self.spotify_client_id        = os.environ.get('SPOTIPY_CLIENT_ID')
+        self.spotify_client_secret    = os.environ.get('SPOTIPY_CLIENT_SECRET')
         self.openai_api_key           = os.environ.get('OPENAI_API_KEY')
 
         # Tell our app where to get its environment variables from
@@ -29,10 +29,9 @@ class Playlist:
         self.playlist_id = playlist_id
 
     def get_tracks(self):
-        cfg = Config()
         # Authenticate with the Spotify API
-        client_credentials_manager = SpotifyClientCredentials(client_id=cfg.spotify_client_id, client_secret=cfg.spotify_client_secret)
-        sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+        sp_creds = SpotifyClientCredentials()
+        sp = spotipy.Spotify(client_credentials_manager=sp_creds)
 
         # Get the tracks from the playlist
         results     = sp.playlist_items(self.playlist_id)
@@ -43,24 +42,25 @@ class Playlist:
         for track in tracks:
             track_list.append(track['track']['name'] + ' by ' + track['track']['album']['artists'][0]['name'])
 
-        return track_list
+        track_list_str = '\n'.join(track_list)
+
+        return track_list_str
 
 class BlogPost:
 
     def __init__(self, playlist_id):
         self.playlist_id = playlist_id
-    
+
     def generate_blog_post(self):
         # Authenticate with the OpenAI API
-        openai.api_key = Config.openai_api_key
+        cfg = Config()
+        openai.api_key = cfg.openai_api_key
         
-        playlist = Playlist(self.playlist_id)
-
-        # Convert the playlist to a string
-        playlist_to_str = '\n'.join(self.playlist)
+        play     = Playlist(self.playlist_id)
+        playlist = play.get_tracks()
 
         # Generate a blog post about the playlist
-        prompt   = f"Write a blog post about the contents of this Spotify playlist in the style of a music blogger at Pitchfork:\n{playlist}"
+        prompt   = f"My Life in Music is a music blog that posts weekly Spotify playlists every Friday\nYour task is to assume that you are a music blogger who is writing a blog post about the contents of this week's Spotify playlist.\n The playlist is as follows:\n{playlist}"
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -78,9 +78,11 @@ class BlogPost:
             return result
 
 if __name__ == '__main__':
-    playlist_id = '37i9dQZF1DXdPec7aLTmlC'
+    playlist_id = '5JjFtIaS0PZM12XBfQhbCz'
     playlist    = Playlist(playlist_id)
-    blogpost    = BlogPost(playlist.get_tracks)
-    print(playlist.get_tracks)
-    print(type(blogpost.generate_blog_post))
-    blogpost.generate_blog_post()
+    tracks = playlist.get_tracks()
+    blogpost    = BlogPost(playlist_id)
+
+    post = blogpost.generate_blog_post()
+
+    print(post)

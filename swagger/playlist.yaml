@@ -1,6 +1,18 @@
 This endpoint returns the raw playlist data.
 ---
 parameters:
+  - name: spotify_client_id
+    in: query
+    type: string
+    required: true
+    default: ''
+    description: Spotify Client ID
+  - name: spotify_client_secret
+    in: query
+    type: string
+    required: true
+    default: ''
+    description: Spotify Client Secret
   - name: playlist_id
     in: query
     type: string
@@ -11,6 +23,12 @@ definitions:
   playlist:
     type: object
     properties:
+      spotify_client_id:
+        type: string
+        default: ''
+      spotify_client_secret:
+        type: string
+        default: ''
       playlist_id:
         type: string
         default: '7lqsZmcl8sIhzC4rCl5zlA'
@@ -20,9 +38,19 @@ responses:
     schema:
       $ref: '#/definitions/playlist'
       properties:
+        spotify_client_id:
+          type: string
+          description: Spotify Client ID
+          default: ''
+        spotify_client_secret:
+          type: string
+          description: Spotify Client Secret
+          default: ''
         playlist_id:
             type: string
             description: ID of the playlist (can be found in the Playlist URL just before the query string)
             default: '7lqsZmcl8sIhzC4rCl5zlA'
     example:
+      spotify_client_id: ''
+      spotify_client_secret: ''
       playlist_id: '7lqsZmcl8sIhzC4rCl5zlA'

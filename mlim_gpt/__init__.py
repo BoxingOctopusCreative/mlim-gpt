@@ -1,6 +1,7 @@
 import os
 import openai
 import spotipy
+import base64
 from spotipy.oauth2 import SpotifyClientCredentials
 from dotenv import load_dotenv, find_dotenv
 
@@ -11,8 +12,8 @@ class Config:
         self.app_key                  = os.environ.get('APP_KEY')
         self.listen                   = os.environ.get('LISTEN')
         self.port                     = os.environ.get('PORT')
-        self.spotify_client_id        = os.environ.get('SPOTIFY_CLIENT_ID')
-        self.spotify_client_secret    = os.environ.get('SPOTIFY_CLIENT_SECRET')
+        self.spotify_client_id        = os.environ.get('SPOTIPY_CLIENT_ID')
+        self.spotify_client_secret    = os.environ.get('SPOTIPY_CLIENT_SECRET')
         self.openai_api_key           = os.environ.get('OPENAI_API_KEY')
 
         # Tell our app where to get its environment variables from
@@ -20,19 +21,20 @@ class Config:
         try:
             load_dotenv(dotenv_path)
         except IOError:
+            print("IOError")
             find_dotenv()
 
 class Playlist:
-
-    def __init__(self, playlist_id):
-        self.playlist_id = playlist_id
-        self.tracks      = self.get_tracks()
+    def __init__(self, spotify_client_id: str, spotify_client_secret: str, playlist_id: str):
+        self.spotify_client_id     = spotify_client_id
+        self.spotify_client_secret = spotify_client_secret
+        self.playlist_id           = playlist_id
 
     def get_tracks(self):
-        cfg = Config()
         # Authenticate with the Spotify API
-        client_credentials_manager = SpotifyClientCredentials(client_id=cfg.spotify_client_id, client_secret=cfg.spotify_client_secret)
-        sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+        sp_creds = SpotifyClientCredentials(client_id=self.spotify_client_id, 
+                                            client_secret=self.spotify_client_secret)
+        sp       = spotipy.Spotify(client_credentials_manager=sp_creds)
 
         # Get the tracks from the playlist
         results     = sp.playlist_items(self.playlist_id)
@@ -41,29 +43,44 @@ class Playlist:
 
         # Append the track name and artist to the list
         for track in tracks:
-            track_list.append(track['track']['name'] + ' by ' + track['track']['album']['artists'][0]['name'])
+            track_name   = track['track']['name']
+            album_artist = track['track']['album']['artists'][0]['name']
+            track_list.append(f'{track_name} by {album_artist}')
+            #track_list.append(track['track']['name'] + ' by ' + track['track']['album']['artists'][0]['name'])
 
-        return track_list
+        track_list_str = '\n'.join(track_list)
+
+        return track_list_str
 
 class BlogPost:
 
-    def __init__(self, playlist_id, openai_api_key):
-        self.playlist_id = playlist_id
-        self.openai_api_key = openai_api_key
-        self.playlist    = Playlist(self.playlist_id)
-        self.blog_post   = self.generate_blog_post()
-    
+    def __init__(self, spotify_client_id: str, spotify_client_secret: str, 
+                 prompt: str, openai_api_key: str, playlist_id: str):
+
+        self.spotify_client_id     = spotify_client_id
+        self.spotify_client_secret = spotify_client_secret
+        self.prompt                = prompt
+        self.openai_api_key        = openai_api_key
+        self.playlist_id           = playlist_id
+
     def generate_blog_post(self):
         # Authenticate with the OpenAI API
-        openai.api_key = Config.openai_api_key
-        
+        openai.api_key = self.openai_api_key
+
+        # Get the tracks from the playlist
+        play     = Playlist(spotify_client_id=self.spotify_client_id,
+                            spotify_client_secret=self.spotify_client_secret,
+                            playlist_id=self.playlist_id)
+        playlist = play.get_tracks()
+
         # Generate a blog post about the playlist
-        prompt   = f"Write a blog post about the contents of this Spotify playlist in the style of a music blogger at Pitchfork:\n{self.playlist}"
-        response = openai.ChatCompletion.create(
+        decoded_prompt = base64.b64decode(self.prompt).decode('utf-8')
+        full_prompt   = f"{decoded_prompt}\nThe playlist is as follows:\n{playlist}"
+        response      = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {'role': 'system', 'content': 'You are a chatbot'},
-                {'role': 'user',   'content': prompt}
+                {'role': 'user',   'content': full_prompt}
             ]
         )
         result = ''
@@ -73,7 +90,7 @@ class BlogPost:
         try:
             return result
         except:
-            return str(type(result))
+            return result
 
 class SwaggerDef:
 

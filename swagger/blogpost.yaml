@@ -1,12 +1,36 @@
 This endpoint returns a ChatGPT-generated blog post about the contents of a given Spotify playlist.
 ---
 parameters:
+  - name: spotify_client_id
+    in: query
+    type: string
+    required: true
+    default: ''
+    description: Spotify Client ID
+  - name: spotify_client_secret
+    in: query
+    type: string
+    required: true
+    default: ''
+    description: Spotify Client Secret
+  - name: prompt
+    in: query
+    type: string
+    required: true
+    default: 'TXkgTGlmZSBpbiBNdXNpYyBpcyBhIG11c2ljIGJsb2cgdGhhdCBwb3N0cyB3ZWVrbHkgU3BvdGlmeSBwbGF5bGlzdHMgZXZlcnkgRnJpZGF5CllvdXIgdGFzayBpcyB0byBhc3N1bWUgdGhhdCB5b3UgYXJlIGEgbXVzaWMgYmxvZ2dlciB3aG8gaXMgd3JpdGluZyBhIGJsb2cgcG9zdCBhYm91dCB0aGUgY29udGVudHMgb2YgdGhpcyB3ZWVrJ3MgU3BvdGlmeSBwbGF5bGlzdC4KCg=='
+    description: A base64-encoded prompt to use for the blog post
   - name: playlist_id
     in: query
     type: string
     required: true
     default: '7lqsZmcl8sIhzC4rCl5zlA'
     description: ID of the playlist (can be found in the Playlist URL just before the query string)
+  - name: openai_api_key
+    in: query
+    type: string
+    required: true
+    default: ''
+    description: OpenAI API Key
 definitions:
   blogpost:
     type: object

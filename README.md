@@ -1,4 +1,4 @@
-# Project Title
+# My Life in Music Blog Post Generator
 
 ## Table of Contents
 
