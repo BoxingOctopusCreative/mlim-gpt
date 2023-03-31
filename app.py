@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flasgger import Swagger, swag_from
 import mlim_gpt
 
@@ -40,6 +40,22 @@ def blogpost():
                                               openai_api_key=openai_api_key)
     
     return jsonify(blogpost.generate_blog_post())
+
+@app.route('/htmlpost', methods=['GET'])
+def htmlpost():
+    spotify_client_id     = request.args.get('spotify_client_id')
+    spotify_client_secret = request.args.get('spotify_client_secret')
+    openai_api_key        = request.args.get('openai_api_key')
+    prompt                = request.args.get('prompt')
+    plist_id              = request.args.get('playlist_id')
+    blogpost              = mlim_gpt.BlogPost(spotify_client_id=spotify_client_id,
+                                              spotify_client_secret=spotify_client_secret,
+                                              playlist_id=plist_id, 
+                                              prompt=prompt, 
+                                              openai_api_key=openai_api_key)
+    post = blogpost.generate_blog_post()
+
+    return render_template('blogpost.html.j2', post=post)
 
 if __name__ == '__main__':
     app.run(host=listen, port=port)

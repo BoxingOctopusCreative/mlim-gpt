@@ -84,6 +84,9 @@ class BlogPost:
         for choice in response.choices:
             result += choice.message.content
 
+        # Clean up the blog post
+        formatted_result = result.replace('\\n', '\n').replace('<br />', '<br /> ')
+
         try:
             return result
         except:

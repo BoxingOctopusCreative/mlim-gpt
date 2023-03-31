@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    <body>
+        <p>
+        {% autoescape false %}
+        {{ post | replace('\n', '<br />') }}
+        {% endautoescape %}
+        </p>
+    </body>
+</html>
