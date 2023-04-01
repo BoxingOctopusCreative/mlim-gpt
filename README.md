@@ -5,42 +5,52 @@
 - [About](#about)
 - [Getting Started](#getting_started)
 - [Usage](#usage)
-- [Contributing](../CONTRIBUTING.md)
 
 ## About <a name = "about"></a>
 
-Write about 1-2 paragraphs describing the purpose of your project.
+A stupid GPT-3 experiment to generate blog posts to accompany the weekly Spotify playlists for my music blog, [My Life in Music](https://mylifeinmusic.me).
 
 ## Getting Started <a name = "getting_started"></a>
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See [deployment](#deployment) for notes on how to deploy the project on a live system.
+What? You want to run this? Why?? It basically amounts to an AI shitposting on my blog. But if you really want to, here's how.
 
 ### Prerequisites
 
-What things you need to install the software and how to install them.
+* Python 3.8+
+* A GPT-3 API key
+* Spotify API Credentials
 
-```
-Give examples
-```
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running.
+#### Without Docker
 
-Say what the step will be
+Clone the repo:
 
-```
-Give the example
-```
+`git clone https://github.com/BoxingOctopusCreative/mlim-gpt`
 
-And repeat
+Install the requirements via pipenv:
 
-```
-until finished
-```
+`pipenv install`
 
-End with an example of getting some data out of the system or using it for a little demo.
+Run the app using gunicorn:
+
+`gunicorn --bind 0.0.0.0:5000 app:app`
+
+#### With Docker
+
+Clone the repo:
+
+`git clone https://github.com/BoxingOctopusCreative/mlim-gpt`
+
+Build the docker image:
+
+`docker build -t mlim-gpt .`
+
+Run the docker image:
+
+`docker run -p 5000:5000 mlim-gpt`
 
 ## Usage <a name = "usage"></a>
 
-Add notes about how to use the system.
+Once the service is running, it should be accessible on port 5000. For a full list of API endpoints, you can access the Swagger UI at `http://app_host:5000/apidocs`.
