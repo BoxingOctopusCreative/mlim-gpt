@@ -10,15 +10,16 @@ except IOError:
     find_dotenv()
 
 if os.environ.get('DOCKER') == 'True':
+    listen    = '0.0.0.0'
     accesslog = '-' # Log to stdout
     errorlog  = '-' # Log to stdout
     port      = 5000
 else:
+    listen    = os.environ.get('LISTEN')
+    port      = os.environ.get('PORT')
     accesslog = './log/gunicorn.access.log'
     errorlog  = './log/gunicorn.error.log'
-    port      = os.environ.get('PORT')
 
-listen          = os.environ.get('LISTEN')
 bind            = f'{listen}:{port}'
 reload          = True
 #worker_tmp_dir  = '/dev/shm'
