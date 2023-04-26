@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  mlim-gpt:
+    image: ghcr.io/boxingoctopuscreative/mlim-gpt:latest
+    container_name: mlim-gpt
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+      - traefik.http.routers.mlimgpt.rule=Host(`mlimgpt.boxingoctopus.io`)
+      - traefik.http.routers.mlimgpt.tls=true
+      - traefik.http.routers.mlimgpt.entrypoints=websecure
+      - traefik.http.routers.mlimgpt.service=mlimgpt
+      - traefik.http.routers.mlimgpt.tls.certresolver=leresolver
+      - traefik.http.services.mlimgpt.loadbalancer.server.port=5000
+      - traefik.http.middlewares.mlimgpt.headers.SSLRedirect=true
+      - traefik.http.middlewares.mlimgpt.headers.STSSeconds=315360000
+      - traefik.http.middlewares.mlimgpt.headers.browserXSSFilter=true
+      - traefik.http.middlewares.mlimgpt.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.mlimgpt.headers.forceSTSHeader=true
+      - traefik.http.middlewares.mlimgpt.headers.SSLHost=boxingoctopus.io
+      - traefik.http.middlewares.mlimgpt.headers.STSIncludeSubdomains=true
+      - traefik.http.middlewares.mlimgpt.headers.STSPreload=true
+
+networks:
+  default:
+    external: true
+    name: portainer_default
